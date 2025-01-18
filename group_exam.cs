@@ -50,43 +50,12 @@ public class CalorieCalculator
     }
 
    
-    public static void CaloriesInfo(int age, double weight, double height, string gender, double activityLevel, Goal goal)
+    public static string CaloriesInfo(int age, double weight, double height, string gender, double activityLevel, Goal goal)
     {
         double caloriesconsupshion = Calculate_CaloriesConsupshion(age, weight, height, gender);
         double caloriesneed = Calculate_CaloriesNeed(caloriesconsupshion, activityLevel);
         double caloriesnorm = Calculate_CaloriesNorm(caloriesneed, goal);
 
-        Console.WriteLine($"Ваш дневной расходкаллорий для поддержания жизнедеятельности : {caloriesconsupshion} ккал/день");
-        Console.WriteLine($"Потребность в каллориях с учетом кативности : {caloriesneed} ккал/день");
-        Console.WriteLine($"Ваша дневная норма каллорий {goal}: {caloriesnorm} ккал/день");
-    }
-}
-
-// Пример использования класса
-public class Program
-{
-    public static void Main()
-    {
-       
-        Console.Write("Введите возраст: ");
-        int age = int.Parse(Console.ReadLine());
-
-        Console.Write("Введите вес (в кг): ");
-        double weight = double.Parse(Console.ReadLine());
-
-        Console.Write("Введите рост (в см): ");
-        double height = double.Parse(Console.ReadLine());
-
-        Console.Write("Введите пол (мужской/женский): ");
-        string gender = Console.ReadLine().ToLower();
-
-        Console.Write("Введите уровень физической активности (1.2 - сидячий, 1.375 - легкая, 1.55 - умеренная, 1.725 - высокая, 1.9 - очень высокая): ");
-        double activityLevel = double.Parse(Console.ReadLine());
-
-        Console.Write("Введите цель (MinusWeight, StopWeight, PlusWeight): ");
-        Goal goal = (Goal)Enum.Parse(typeof(Goal), Console.ReadLine(), true);
-
-       
-        CalorieCalculator.CaloriesInfo(age, weight, height, gender, activityLevel, goal);
+        return($"Ваш дневной расходкаллорий для поддержания жизнедеятельности : {caloriesconsupshion} ккал/день" + $"Потребность в каллориях с учетом кативности : {caloriesneed} ккал/день" + $"Ваша дневная норма каллорий {goal}: {caloriesnorm} ккал/день");
     }
 }
