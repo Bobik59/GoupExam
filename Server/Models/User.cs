@@ -8,5 +8,10 @@ namespace Server.Models
 {
     internal class User
     {
+        public int UserId { get; set; }
+        public string Name { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public decimal Weight { get; set; } // Вес пользователя
+        public decimal Height { get; set; } // Рост пользователя
     }
 }
