@@ -22,6 +22,12 @@ namespace Server.Models
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<CalorieGoal>()
+                .HasKey(c => c.GoalId);
+
+            modelBuilder.Entity<CalorieIntakeEntry>()
+                .HasKey(c => c.EntryId);
+
             // Уникальность названий продуктов и блюд
             modelBuilder.Entity<Product>()
                 .HasIndex(p => p.Name)
