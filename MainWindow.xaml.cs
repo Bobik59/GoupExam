@@ -111,30 +111,60 @@ namespace GoupExam
             CentralArea.Children.Clear();
 
             var stackPanel = new StackPanel();
+
+            // Поле для ввода названия продукта
+            var searchBox = new TextBox { PlaceholderText = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
+            var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
             var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
 
-            // Пример продуктов (вместо парсинга)
-            var products = new[]
+            searchButton.Click += (s, args) =>
             {
-                new { Name = "Яблоко", Calories = 52 },
-                new { Name = "Банан", Calories = 96 },
-                new { Name = "Куриное филе", Calories = 165 }
+                productList.Items.Clear();
+
+                // Здесь выполняется поиск продуктов по базе данных
+                var searchQuery = searchBox.Text;
+                var products = GetProductsFromDatabase(searchQuery);
+
+                if (products.Any())
+                {
+                    foreach (var product in products)
+                    {
+                        var button = new Button { Content = $"{product.Name} ({product.CaloriesPer100g} ккал на 100г)", Margin = new Thickness(0, 5, 0, 5) };
+                        button.Click += (s, args) =>
+                        {
+                            ProductList.Items.Add($"{product.Name} - {product.CaloriesPer100g} ккал на 100г");
+                            totalCalories += (int)product.CaloriesPer100g;
+                            TotalCalories.Text = totalCalories.ToString();
+                        };
+                        productList.Items.Add(button);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Продукт не найден!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             };
 
-            foreach (var product in products)
-            {
-                var button = new Button { Content = $"{product.Name} ({product.Calories} ккал)", Margin = new Thickness(0, 5, 0, 5) };
-                button.Click += (s, args) =>
-                {
-                    ProductList.Items.Add($"{product.Name} - {product.Calories} ккал");
-                    totalCalories += product.Calories;
-                    TotalCalories.Text = totalCalories.ToString();
-                };
-                stackPanel.Children.Add(button);
-            }
+            stackPanel.Children.Add(searchBox);
+            stackPanel.Children.Add(searchButton);
+            stackPanel.Children.Add(productList);
 
             CentralArea.Children.Add(stackPanel);
         }
+
+        // Метод для загрузки данных из базы данных
+        private IEnumerable<Product> GetProductsFromDatabase(string query)
+        {
+            // Пример данных, замените на реальный запрос к базе данных
+            var sampleProducts = new List<Product>
+        {
+        new Product { ProductId = 1, Name = "Морковь", Category = "Овощи", CaloriesPer100g = 35, ProteinPer100g = 0.8m, FatPer100g = 0.1m, CarbsPer100g = 6.7m },
+        new Product { ProductId = 2, Name = "Гречка", Category = "Крупы", CaloriesPer100g = 329, ProteinPer100g = 12.6m, FatPer100g = 3.3m, CarbsPer100g = 62.1m }
+    };
+
+            return sampleProducts.Where(p => p.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
+        }
+
         private void RemoveProduct_Click(object sender, RoutedEventArgs e)
         {
             if (ProductList.SelectedItem != null)
