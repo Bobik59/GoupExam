@@ -23,9 +23,6 @@ namespace Server
             // Автоматическое создание базы данных, если её нет
             await context.Database.EnsureCreatedAsync();
 
-            // Заполнение базы данных начальными данными
-            await SeedData(context);
-
             TcpListener server = new TcpListener(IPAddress.Parse(serverAddress), port);
             server.Start();
             Console.WriteLine("Сервер запущен. Ожидание подключений...");
@@ -102,77 +99,6 @@ namespace Server
             else
             {
                 return "Продукт или блюдо не найдено.";
-            }
-        }
-
-
-        // Метод для заполнения базы данных начальными данными
-        private static async Task SeedData(ApplicationDbContext context)
-        {
-            if (!context.Products.Any())
-            {
-                var initialProducts = new List<Product>
-                {
-                    new Product
-                    {
-                        Name = "Яблоко",
-                        Category = "Фрукты",
-                        CaloriesPer100g = 52,
-                        ProteinPer100g = 0.3m,
-                        FatPer100g = 0.2m,
-                        CarbsPer100g = 14
-                    },
-                    new Product
-                    {
-                        Name = "Куриное филе",
-                        Category = "Мясо",
-                        CaloriesPer100g = 165,
-                        ProteinPer100g = 31,
-                        FatPer100g = 3.6m,
-                        CarbsPer100g = 0
-                    }
-                };
-
-                context.Products.AddRange(initialProducts);
-                await context.SaveChangesAsync();
-
-                Console.WriteLine("Таблица Products была успешно заполнена.");
-            }
-            else
-            {
-                Console.WriteLine("Таблица Products уже содержит данные.");
-            }
-
-            if (!context.Dishes.Any())
-            {
-                var initialDishes = new List<Dish>
-                {
-                    new Dish
-                    {
-                        Name = "Овощной салат",
-                        Calories = 150,
-                        Protein = 3,
-                        Fat = 10,
-                        Carbs = 20
-                    },
-                    new Dish
-                    {
-                        Name = "Суп-пюре из тыквы",
-                        Calories = 200,
-                        Protein = 5,
-                        Fat = 8,
-                        Carbs = 30
-                    }
-                };
-
-                context.Dishes.AddRange(initialDishes);
-                await context.SaveChangesAsync();
-
-                Console.WriteLine("Таблица Dishes была успешно заполнена.");
-            }
-            else
-            {
-                Console.WriteLine("Таблица Dishes уже содержит данные.");
             }
         }
     }
