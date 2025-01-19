@@ -10,6 +10,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Linq;
+using Server.Models;
 
 
 namespace GoupExam
@@ -113,7 +114,7 @@ namespace GoupExam
             var stackPanel = new StackPanel();
 
             // Поле для ввода названия продукта
-            var searchBox = new TextBox { PlaceholderText = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
+            var searchBox = new TextBox { Text = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
             var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
             var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
 
@@ -158,9 +159,9 @@ namespace GoupExam
             // Пример данных, замените на реальный запрос к базе данных
             var sampleProducts = new List<Product>
         {
-        new Product { ProductId = 1, Name = "Морковь", Category = "Овощи", CaloriesPer100g = 35, ProteinPer100g = 0.8m, FatPer100g = 0.1m, CarbsPer100g = 6.7m },
-        new Product { ProductId = 2, Name = "Гречка", Category = "Крупы", CaloriesPer100g = 329, ProteinPer100g = 12.6m, FatPer100g = 3.3m, CarbsPer100g = 62.1m }
-    };
+            new Product { ProductId = 1, Name = "Морковь", Category = "Овощи", CaloriesPer100g = 35, ProteinPer100g = 0.8m, FatPer100g = 0.1m, CarbsPer100g = 6.7m },
+            new Product { ProductId = 2, Name = "Гречка", Category = "Крупы", CaloriesPer100g = 329, ProteinPer100g = 12.6m, FatPer100g = 3.3m, CarbsPer100g = 62.1m }
+        };
 
             return sampleProducts.Where(p => p.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
         }
