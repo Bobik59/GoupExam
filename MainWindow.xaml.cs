@@ -79,7 +79,8 @@ namespace GoupExam
             bodyTypeComboBox.Items.Add("Мезоморфный");
             bodyTypeComboBox.Items.Add("Брахиморфный");
 
-            var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -10, 0, -10) };
+
+            var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -20, 0, -20) };
             submitButton.Click += (s, args) =>
             {
                 if (!string.IsNullOrEmpty(nameTextBox.Text) &&
