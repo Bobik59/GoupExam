@@ -17,43 +17,65 @@ namespace GoupExam
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string serverAddress = "127.0.0.1";
-        private const int serverPort = 12345;
+        private const string ServerAddress = "127.0.0.1";  // Адрес сервера
+        private const int Port = 12345;  // Порт сервера
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void OnGetProductClick(object sender, RoutedEventArgs e)
+        // Обработчик нажатия на кнопку "Получить данные о продукте"
+        private async void OnGetProductClick(object sender, RoutedEventArgs e)
         {
-            SendRequest(QueryTextBox.Text);
+            string query = InputTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                OutputTextBox.Text = "Введите название продукта.";
+                return;
+            }
+
+            string response = await GetResponseFromServer(query);
+            OutputTextBox.Text = response;
         }
 
-        private void OnGetDishClick(object sender, RoutedEventArgs e)
+        // Обработчик нажатия на кнопку "Получить данные о блюде"
+        private async void OnGetDishClick(object sender, RoutedEventArgs e)
         {
-            SendRequest(QueryTextBox.Text);
+            string query = InputTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                OutputTextBox.Text = "Введите название блюда.";
+                return;
+            }
+
+            string response = await GetResponseFromServer(query);
+            OutputTextBox.Text = response;
         }
 
-        private void SendRequest(string query)
+        // Общий метод для отправки запроса на сервер и получения ответа
+        private async Task<string> GetResponseFromServer(string query)
         {
             try
             {
-                using (TcpClient client = new TcpClient(serverAddress, serverPort))
-                using (NetworkStream stream = client.GetStream())
-                {
-                    byte[] data = Encoding.UTF8.GetBytes(query);
-                    stream.Write(data, 0, data.Length);
+                using var client = new TcpClient();
+                await client.ConnectAsync(ServerAddress, Port);
 
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                var stream = client.GetStream();
+                var requestBytes = Encoding.UTF8.GetBytes(query);
+                await stream.WriteAsync(requestBytes, 0, requestBytes.Length);
 
-                    ResultTextBox.Text = response;
-                }
+                byte[] buffer = new byte[1024];
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                return response;
             }
             catch (Exception ex)
             {
-                ResultTextBox.Text = "Ошибка: " + ex.Message;
+                return "Ошибка: " + ex.Message;
             }
         }
     }
