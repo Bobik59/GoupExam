@@ -11,7 +11,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Linq;
-//using Server.Models;  
+
 
 
 namespace GoupExam
@@ -83,7 +83,7 @@ namespace GoupExam
             bodyTypeComboBox.Items.Add("Брахиморфный");
 
 
-            var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -20, 0, -20) };
+            var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(10, 10, 10, -5) };
             submitButton.Click += (s, args) =>
             {
                 if (!string.IsNullOrEmpty(nameTextBox.Text) &&
@@ -224,15 +224,15 @@ namespace GoupExam
             //CentralArea.Children.Add(stackPanel);
         }
 
-        // Метод для загрузки данных из базы данных
+
         //private IEnumerable<Product> GetProductsFromDatabase(string query)
         //{
         //    // Пример данных, замените на реальный запрос к базе данных
         //    var sampleProducts = new List<Product>
-        //{
-        //    new Product { ProductId = 1, Name = "Морковь", Category = "Овощи", CaloriesPer100g = 35, ProteinPer100g = 0.8m, FatPer100g = 0.1m, CarbsPer100g = 6.7m },
-        //    new Product { ProductId = 2, Name = "Гречка", Category = "Крупы", CaloriesPer100g = 329, ProteinPer100g = 12.6m, FatPer100g = 3.3m, CarbsPer100g = 62.1m }
-        //};
+        //    {   
+        //        new Product { ProductId = 1, Name = "Морковь", Category = "Овощи", CaloriesPer100g = 35, ProteinPer100g = 0.8m, FatPer100g = 0.1m, CarbsPer100g = 6.7m },
+        //        new Product { ProductId = 2, Name = "Гречка", Category = "Крупы", CaloriesPer100g = 329, ProteinPer100g = 12.6m, FatPer100g = 3.3m, CarbsPer100g = 62.1m }
+        //    };
 
         //    return sampleProducts.Where(p => p.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
         //}
