@@ -12,12 +12,17 @@ class Program
 
     static async Task Main(string[] args)
     {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+               .UseSqlServer(connectionString)
+               .Options;
 
+        using var context = new ApplicationDbContext(options);
 
+        await context.Database.EnsureCreatedAsync();
 
         string apiUrl = "https://world.openfoodfacts.org/cgi/search.pl";
-        string query = "банан"; // Запрос для поиска яблок
-        int pageSize = 3;      // Количество результатов на странице
+        string query = "яблоки";
+        int pageSize = 1;
 
         // Параметры запроса
         string url = $"{apiUrl}?search_terms={query}&page_size={pageSize}&json=true";
@@ -43,13 +48,36 @@ class Program
                         string protein = product["nutriments"]?["proteins_100g"]?.ToString() ?? "Нет данных";
                         string fat = product["nutriments"]?["fat_100g"]?.ToString() ?? "Нет данных";
                         string carbs = product["nutriments"]?["carbohydrates_100g"]?.ToString() ?? "Нет данных";
+                        string categories = product["categories"]?.ToString() ?? "Нет данных";
 
-                        Console.WriteLine($"Название: {name}");
-                        Console.WriteLine($"Калории на 100 г: {calories}");
-                        Console.WriteLine($"Белки на 100 г: {protein}");
-                        Console.WriteLine($"Жиры на 100 г: {fat}");
-                        Console.WriteLine($"Углеводы на 100 г: {carbs}");
-                        Console.WriteLine(new string('-', 30));
+                        decimal calories1 = decimal.TryParse(calories, out var cal) ? cal : 0;
+                        decimal protein1 = decimal.TryParse(protein, out var pro) ? pro : 0;
+                        decimal fat1 = decimal.TryParse(fat, out var f) ? f : 0;
+                        decimal carbs1 = decimal.TryParse(carbs, out var c) ? c : 0;
+
+                        using (var dbContext = new ApplicationDbContext(options))
+                        {
+                            // Убедитесь, что база данных создана
+                            dbContext.Database.EnsureCreated();
+
+                            // Создаем объект продукта
+                            var products = new Product
+                            {
+                                Name = name,
+                                Category = categories,
+                                CaloriesPer100g = calories1,
+                                ProteinPer100g = protein1,
+                                FatPer100g = fat1,
+                                CarbsPer100g = carbs1
+                            };
+
+                            dbContext.Products.Add(products);
+
+                            // Сохраняем изменения в базе данных
+                            dbContext.SaveChanges();
+
+                            Console.WriteLine("Продукт успешно добавлен в базу данных.");
+                        }
                     }
                 }
                 else
