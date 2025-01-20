@@ -76,11 +76,11 @@ namespace GoupExam
             var AgeTextBox = new TextBox { Text = "Дата рождения(год)", Margin = new Thickness(0, 5, 0, 5) };
             AgeTextBox.GotFocus += (s, e) =>
             {
-                if (AgeTextBox.Text == "Дата рождения(год)") AgeTextBox.Text = "";
+                if (AgeTextBox.Text == "Возраст(год)") AgeTextBox.Text = "";
             };
             AgeTextBox.LostFocus += (s, e) =>
             {
-                if (string.IsNullOrWhiteSpace(AgeTextBox.Text)) AgeTextBox.Text = "Дата рождения(год)";
+                if (string.IsNullOrWhiteSpace(AgeTextBox.Text)) AgeTextBox.Text = "Возраст(год)";
             };
 
             var genderComboBox = new ComboBox { Margin = new Thickness(0, 5, 0, 5) };
@@ -103,7 +103,7 @@ namespace GoupExam
                     !string.IsNullOrEmpty(weightTextBox.Text) &&
                     weightTextBox.Text != "Вес (кг)" &&
                     !string.IsNullOrEmpty(AgeTextBox.Text) &&
-                    AgeTextBox.Text != "Дата рождения(год)" &&
+                    AgeTextBox.Text != "Возраст(год)" &&
                     genderComboBox.SelectedItem != null &&
                     bodyTypeComboBox.SelectedItem != null)
                 {

@@ -10,7 +10,7 @@ namespace Server.Models
     {
         public int UserId { get; set; }
         public string Name { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public int Year { get; set; }
         public decimal Weight { get; set; } // Вес пользователя
         public decimal Height { get; set; } // Рост пользователя
     }
