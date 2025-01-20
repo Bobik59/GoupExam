@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Sockets;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,6 +18,8 @@ namespace GoupExam
 {
     public partial class MainWindow : Window
     {
+        private const string serverAddress = "127.0.0.1";
+        private const int serverPort = 12345;
         private int totalCalories = 0;
 
         public MainWindow()
