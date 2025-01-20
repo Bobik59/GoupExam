@@ -8,6 +8,8 @@ using Server.Models;
 using Microsoft.EntityFrameworkCore;
 class Program
 {
+    private static readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Calories;Trusted_Connection=True;TrustServerCertificate=True;";
+
     static async Task Main(string[] args)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
