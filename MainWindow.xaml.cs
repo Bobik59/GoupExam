@@ -73,6 +73,16 @@ namespace GoupExam
                 if (string.IsNullOrWhiteSpace(weightTextBox.Text)) weightTextBox.Text = "Вес (кг)";
             };
 
+            var AgeTextBox = new TextBox { Text = "Дата рождения(год)", Margin = new Thickness(0, 5, 0, 5) };
+            AgeTextBox.GotFocus += (s, e) =>
+            {
+                if (AgeTextBox.Text == "Дата рождения(год)") AgeTextBox.Text = "";
+            };
+            AgeTextBox.LostFocus += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(AgeTextBox.Text)) AgeTextBox.Text = "Дата рождения(год)";
+            };
+
             var genderComboBox = new ComboBox { Margin = new Thickness(0, 5, 0, 5) };
             genderComboBox.Items.Add("Мужской");
             genderComboBox.Items.Add("Женский");
@@ -92,10 +102,12 @@ namespace GoupExam
                     heightTextBox.Text != "Рост (см)" &&
                     !string.IsNullOrEmpty(weightTextBox.Text) &&
                     weightTextBox.Text != "Вес (кг)" &&
+                    !string.IsNullOrEmpty(AgeTextBox.Text) &&
+                    AgeTextBox.Text != "Дата рождения(год)" &&
                     genderComboBox.SelectedItem != null &&
                     bodyTypeComboBox.SelectedItem != null)
                 {
-                    File.WriteAllText("user_data.txt", $"Имя: {nameTextBox.Text}\nРост: {heightTextBox.Text}\nВес: {weightTextBox.Text}\nПол: {genderComboBox.SelectedItem}\nТип телосложения: {bodyTypeComboBox.SelectedItem}");
+                    File.WriteAllText("user_data.txt", $"Имя: {nameTextBox.Text}\nРост: {heightTextBox.Text}\nВес: {weightTextBox.Text}\nВозраст: {AgeTextBox.Text}\nПол: {genderComboBox.SelectedItem}\nТип телосложения: {bodyTypeComboBox.SelectedItem}");
                     MessageBox.Show("Данные сохранены!");
                     ButtonProducts.IsEnabled = true;
                     ButtonDiet.IsEnabled = true;
@@ -109,6 +121,7 @@ namespace GoupExam
             stackPanel.Children.Add(nameTextBox);
             stackPanel.Children.Add(heightTextBox);
             stackPanel.Children.Add(weightTextBox);
+            stackPanel.Children.Add(AgeTextBox);
             stackPanel.Children.Add(genderComboBox);
             stackPanel.Children.Add(bodyTypeComboBox);
             stackPanel.Children.Add(submitButton);
@@ -156,13 +169,14 @@ namespace GoupExam
                 // Загрузка данных пользователя
                 var userData = File.ReadAllLines("user_data.txt");
                 var weight = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Вес:"))?.Split(':')[1] ?? "0");
+                var age = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Возраст:"))?.Split(':')[1] ?? "0");
                 var height = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Рост:"))?.Split(':')[1] ?? "0");
                 var gender = userData.FirstOrDefault(line => line.StartsWith("Пол:"))?.Split(':')[1]?.Trim() ?? "";
-                var age = 30; // Здесь можно добавить поле для ввода возраста в будущем
+                
 
-                var caloriesInfo = $"Ваш дневной расход калорий для поддержания жизнедеятельности: {CalorieCalculator.Calculate_CaloriesConsupshion(age, weight, height, gender)} ккал/день\n" +
-                                   $"Потребность в калориях с учетом активности: {CalorieCalculator.Calculate_CaloriesNeed(CalorieCalculator.Calculate_CaloriesConsupshion(age, weight, height, gender), 1.2)} ккал/день\n" +
-                                   $"Ваша дневная норма калорий ({goal}): {CalorieCalculator.Calculate_CaloriesNorm(CalorieCalculator.Calculate_CaloriesNeed(CalorieCalculator.Calculate_CaloriesConsupshion(age, weight, height, gender), 1.2), goal)} ккал/день";
+                var caloriesInfo = $"Ваш дневной расход калорий для поддержания жизнедеятельности: {CalorieCalculator.Calculate_CaloriesConsupshion((int)age, weight, height, gender)} ккал/день\n" +
+                                   $"Потребность в калориях с учетом активности: {CalorieCalculator.Calculate_CaloriesNeed(CalorieCalculator.Calculate_CaloriesConsupshion((int)age, weight, height, gender), 1.2)} ккал/день\n" +
+                                   $"Ваша дневная норма калорий ({goal}): {CalorieCalculator.Calculate_CaloriesNorm(CalorieCalculator.Calculate_CaloriesNeed(CalorieCalculator.Calculate_CaloriesConsupshion((int)age, weight, height, gender), 1.2), goal)} ккал/день";
 
                 CentralArea.Children.Clear();
                 CentralArea.Children.Add(new TextBlock { Text = caloriesInfo, FontSize = 16, TextWrapping = TextWrapping.Wrap });
@@ -182,12 +196,13 @@ namespace GoupExam
         {
             CentralArea.Children.Clear();
 
-            //var stackPanel = new StackPanel();
 
+            var stackPanel = new StackPanel();
+            var searchBox = new TextBox { Text = "", Margin = new Thickness(0, 5, 0, 5) };
+            var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
+            var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
             //// Поле для ввода названия продукта
-            //var searchBox = new TextBox { Text = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
-            //var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
-            //var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
+
 
             //searchButton.Click += (s, args) =>
             //{
@@ -217,11 +232,11 @@ namespace GoupExam
             //    }
             //};
 
-            //stackPanel.Children.Add(searchBox);
-            //stackPanel.Children.Add(searchButton);
-            //stackPanel.Children.Add(productList);
+            stackPanel.Children.Add(searchBox);
+            stackPanel.Children.Add(searchButton);
+            stackPanel.Children.Add(productList);
 
-            //CentralArea.Children.Add(stackPanel);
+            CentralArea.Children.Add(stackPanel);
         }
 
 
