@@ -10,6 +10,11 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+               .UseSqlServer(connectionString)
+               .Options;
+
+
         string apiUrl = "https://world.openfoodfacts.org/cgi/search.pl";
         string query = "банан"; // Запрос для поиска яблок
         int pageSize = 3;      // Количество результатов на странице
