@@ -6,91 +6,156 @@ using System.Globalization;
 using System.Linq;
 using Server.DataBase;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
 class Program
 {
     private static readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Calories;Trusted_Connection=True;TrustServerCertificate=True;";
 
-    static async Task Main(string[] args)
+    static void Main()
     {
+        // Устанавливаем IP-адрес и порт для сервера
+        var ipAddress = IPAddress.Any;
+        var port = 12345;
+        var endpoint = new IPEndPoint(ipAddress, port);
+
+        // Создаем TCP-сервер
+        var listener = new TcpListener(endpoint);
+        listener.Start();
+        Console.WriteLine("Ожидаю подключения клиента...");
+
+        // Ожидаем подключения клиента
+        var client = listener.AcceptTcpClient();
+        Console.WriteLine("Клиент подключен.");
+
+        // Получаем поток для чтения и записи
+        var networkStream = client.GetStream();
+
+        // Цикл обмена сообщениями
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+
+        while (true)
+        {
+            // Чтение данных от клиента
+            bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+            if (bytesRead == 0)
+            {
+                Console.WriteLine("Клиент отключился.");
+                break; // Клиент закрыл соединение
+            }
+
+            string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            Console.WriteLine("Получено от клиента: " + dataReceived);
+
+            // Если клиент отправил команду для завершения, разрываем соединение
+
+            // Сервер вводит ответ вручную
+            string response = (SearchData(dataReceived)).ToString();
+            Console.WriteLine("server" + response);
+            // Отправляем введенный сервером ответ клиенту
+            byte[] responseBytes = Encoding.UTF8.GetBytes(response);
+
+            networkStream.Write(responseBytes, 0, responseBytes.Length);
+            Console.WriteLine("Ответ отправлен клиенту.");
+        }
+
+        // Закрываем соединение
+        client.Close();
+        listener.Stop();
+    }
+    static async Task<string> SearchData(string productName)
+    {
+        string productInfo = null;
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-               .UseSqlServer(connectionString)
-               .Options;
+                    .UseSqlServer(connectionString)
+                    .Options;
 
         using var context = new ApplicationDbContext(options);
+        context.Database.EnsureCreatedAsync();
+        var producter = context.Products
+            .FirstOrDefault(p => p.Name.Equals(productName, StringComparison.OrdinalIgnoreCase));
 
-        await context.Database.EnsureCreatedAsync();
-
-        string apiUrl = "https://world.openfoodfacts.org/cgi/search.pl";
-        string query = "";
-        int pageSize = 1;
-
-        // Параметры запроса
-        string url = $"{apiUrl}?search_terms={query}&page_size={pageSize}&json=true";
-
-        using (HttpClient client = new HttpClient())
+        if (producter != null)
         {
-            try
+            productInfo = ($"Имя: {producter.Name}, Категория: {producter.Category}, Калории: {producter.CaloriesPer100g} ккал на 100г, Белки: {producter.ProteinPer100g} г, Жиры: {producter.FatPer100g} г, Углеводы: {producter.CarbsPer100g} г");
+        }
+        else
+        {
+            string apiUrl = "https://world.openfoodfacts.org/cgi/search.pl";
+            string query = productName;
+            int pageSize = 1;
+
+            string url = $"{apiUrl}?search_terms={query}&page_size={pageSize}&json=true";
+
+            using (HttpClient client = new HttpClient())
             {
-                HttpResponseMessage response = await client.GetAsync(url);
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    HttpResponseMessage response = await client.GetAsync(url);
 
-                    // Парсинг JSON-ответа
-                    JObject data = JObject.Parse(jsonResponse);
-
-                    Console.WriteLine("Результаты поиска продуктов:");
-                    foreach (var product in data["products"])
+                    if (response.IsSuccessStatusCode)
                     {
-                        string name = product["product_name"]?.ToString() ?? "Без названия";
-                        string calories = product["nutriments"]?["energy-kcal_100g"]?.ToString() ?? "Нет данных";
-                        string protein = product["nutriments"]?["proteins_100g"]?.ToString() ?? "Нет данных";
-                        string fat = product["nutriments"]?["fat_100g"]?.ToString() ?? "Нет данных";
-                        string carbs = product["nutriments"]?["carbohydrates_100g"]?.ToString() ?? "Нет данных";
-                        string categories = product["categories"]?.ToString() ?? "Нет данных";
+                        string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                        decimal calories1 = decimal.TryParse(calories, out var cal) ? cal : 0;
-                        decimal protein1 = decimal.TryParse(protein, out var pro) ? pro : 0;
-                        decimal fat1 = decimal.TryParse(fat, out var f) ? f : 0;
-                        decimal carbs1 = decimal.TryParse(carbs, out var c) ? c : 0;
+                        // Парсинг JSON-ответа
+                        JObject data = JObject.Parse(jsonResponse);
 
-                        using (var dbContext = new ApplicationDbContext(options))
+                        Console.WriteLine("Результаты поиска продуктов:");
+                        foreach (var product in data["products"])
                         {
-                            // Убедитесь, что база данных создана
-                            dbContext.Database.EnsureCreated();
+                            string name = product["product_name"]?.ToString() ?? "Без названия";
+                            string calories = product["nutriments"]?["energy-kcal_100g"]?.ToString() ?? "Нет данных";
+                            string protein = product["nutriments"]?["proteins_100g"]?.ToString() ?? "Нет данных";
+                            string fat = product["nutriments"]?["fat_100g"]?.ToString() ?? "Нет данных";
+                            string carbs = product["nutriments"]?["carbohydrates_100g"]?.ToString() ?? "Нет данных";
+                            string categories = product["categories"]?.ToString() ?? "Нет данных";
 
-                            // Создаем объект продукта
-                            var products = new Product
+                            decimal calories1 = decimal.TryParse(calories, out var cal) ? cal : 0;
+                            decimal protein1 = decimal.TryParse(protein, out var pro) ? pro : 0;
+                            decimal fat1 = decimal.TryParse(fat, out var f) ? f : 0;
+                            decimal carbs1 = decimal.TryParse(carbs, out var c) ? c : 0;
+
+                            productInfo = ($"Имя: {name}, Категория: {categories}, Калории: {calories1} ккал на 100г, Белки: {protein1} г, Жиры: {fat1} г, Углеводы: {carbs1} г");
+                            using (var dbContext = new ApplicationDbContext(options))
                             {
-                                Name = name,
-                                Category = categories,
-                                CaloriesPer100g = calories1,
-                                ProteinPer100g = protein1,
-                                FatPer100g = fat1,
-                                CarbsPer100g = carbs1
-                            };
+                                // Убедитесь, что база данных создана
+                                dbContext.Database.EnsureCreated();
 
-                            dbContext.Products.Add(products);
+                                // Создаем объект продукта
+                                var products = new Product
+                                {
+                                    Name = name,
+                                    Category = categories,
+                                    CaloriesPer100g = calories1,
+                                    ProteinPer100g = protein1,
+                                    FatPer100g = fat1,
+                                    CarbsPer100g = carbs1
+                                };
+
+                                dbContext.Products.Add(products);
 
 
-                            string ProductInfo;
-                            // Сохраняем изменения в базе данных
-                            dbContext.SaveChanges();
+                                string ProductInfo;
+                                // Сохраняем изменения в базе данных
+                                dbContext.SaveChanges();
 
-                            Console.WriteLine("Продукт успешно добавлен в базу данных.");
+                                Console.WriteLine("Продукт успешно добавлен в базу данных.");
+                            }
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine($"Ошибка запроса: {response.StatusCode}");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Ошибка запроса: {response.StatusCode}");
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка: {ex.Message}");
             }
         }
+        return productInfo;
     }
 }
