@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Linq;
-using Server.Models;
+using Server.DataBase;
 using Microsoft.EntityFrameworkCore;
 class Program
 {
@@ -21,7 +21,7 @@ class Program
         await context.Database.EnsureCreatedAsync();
 
         string apiUrl = "https://world.openfoodfacts.org/cgi/search.pl";
-        string query = "яблоки";
+        string query = "";
         int pageSize = 1;
 
         // Параметры запроса
@@ -73,6 +73,8 @@ class Program
 
                             dbContext.Products.Add(products);
 
+
+                            string ProductInfo;
                             // Сохраняем изменения в базе данных
                             dbContext.SaveChanges();
 

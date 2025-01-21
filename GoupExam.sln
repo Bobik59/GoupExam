@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoupExam", "GoupExam.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{55A4DC5E-CBCA-4F9D-A509-0E7C950B5661}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopNetwork", "NetworkCore\TopNetwork.csproj", "{01066234-9538-47D6-8755-67355A2DA57C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerСlientBusinessLogic", "ServerСlientBusinessLogic\ServerСlientBusinessLogic.csproj", "{540E2183-6D89-487E-AA0B-B3CCB25B6284}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{55A4DC5E-CBCA-4F9D-A509-0E7C950B5661}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55A4DC5E-CBCA-4F9D-A509-0E7C950B5661}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55A4DC5E-CBCA-4F9D-A509-0E7C950B5661}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01066234-9538-47D6-8755-67355A2DA57C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01066234-9538-47D6-8755-67355A2DA57C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01066234-9538-47D6-8755-67355A2DA57C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01066234-9538-47D6-8755-67355A2DA57C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{540E2183-6D89-487E-AA0B-B3CCB25B6284}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{540E2183-6D89-487E-AA0B-B3CCB25B6284}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{540E2183-6D89-487E-AA0B-B3CCB25B6284}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{540E2183-6D89-487E-AA0B-B3CCB25B6284}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

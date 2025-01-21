@@ -9,10 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NetworkCore\**" />
     <Compile Remove="Server\**" />
+    <Compile Remove="ServerСlientBusinessLogic\**" />
+    <EmbeddedResource Remove="NetworkCore\**" />
     <EmbeddedResource Remove="Server\**" />
+    <EmbeddedResource Remove="ServerСlientBusinessLogic\**" />
+    <None Remove="NetworkCore\**" />
     <None Remove="Server\**" />
+    <None Remove="ServerСlientBusinessLogic\**" />
+    <Page Remove="NetworkCore\**" />
     <Page Remove="Server\**" />
+    <Page Remove="ServerСlientBusinessLogic\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +36,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="NetworkCore\TopNetwork.csproj" />
+    <ProjectReference Include="Server\Server.csproj" />
   </ItemGroup>
 
 </Project>

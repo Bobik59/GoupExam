@@ -5,8 +5,9 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Server.DataBase;
 
-namespace Server.Models
+namespace Server.DataBase
 {
     internal class ApplicationDbContext : DbContext
     {

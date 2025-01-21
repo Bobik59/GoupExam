@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TopNetwork.RequestResponse;
 
 namespace GoupExam
 {
@@ -18,10 +19,10 @@ namespace GoupExam
     public partial class MainWindow : Window
     {
         private const string ServerAddress = "127.0.0.1";  // Адрес сервера
-        private const int Port = 12345;  // Порт сервера
 
         public MainWindow()
         {
+
             InitializeComponent();
         }
 
@@ -58,25 +59,7 @@ namespace GoupExam
         // Общий метод для отправки запроса на сервер и получения ответа
         private async Task<string> GetResponseFromServer(string query)
         {
-            try
-            {
-                using var client = new TcpClient();
-                await client.ConnectAsync(ServerAddress, Port);
 
-                var stream = client.GetStream();
-                var requestBytes = Encoding.UTF8.GetBytes(query);
-                await stream.WriteAsync(requestBytes, 0, requestBytes.Length);
-
-                byte[] buffer = new byte[1024];
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                return "Ошибка: " + ex.Message;
-            }
         }
     }
 }
