@@ -3,11 +3,15 @@ using Server.Models;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using GoupExam;
+
+
 
 namespace Server
 {
     internal class Program
     {
+        public static string pr = QueueManedger.key_1;
         private static readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Calories;Trusted_Connection=True;TrustServerCertificate=True;";
         private static readonly int port = 12345;
         private static readonly string serverAddress = "127.0.0.1";
@@ -173,6 +177,15 @@ namespace Server
             else
             {
                 Console.WriteLine("Таблица Dishes уже содержит данные.");
+            }
+        }
+        //метод разбирающий строку параметров,пришедшую от клиента
+
+        private static async Task SeparatingParameters(string str,string pr)
+        {
+            for(int i = 0; i < str.Length; i++)
+            {
+                if (str[i] == pr[i])
             }
         }
     }

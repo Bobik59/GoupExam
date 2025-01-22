@@ -130,7 +130,7 @@ namespace GoupExam
         }
 
         // Добавление рекомендаций по диете
-        private void ButtonDiet_Click(object sender, RoutedEventArgs e)
+        public void ButtonDiet_Click(object sender, RoutedEventArgs e)
         {
             CentralArea.Children.Clear();
 
@@ -275,5 +275,7 @@ namespace GoupExam
                 MessageBox.Show("Выберите продукт для удаления!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        
     }
 }
