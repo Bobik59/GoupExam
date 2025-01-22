@@ -52,7 +52,7 @@ namespace GoupExam
 
             var stackPanel = new StackPanel();
 
-            var nameTextBox = new TextBox { Text = "Имя", Margin = new Thickness(0, 5, 0, 5) };
+            var nameTextBox = new TextBox { Text = "Имя", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
             nameTextBox.GotFocus += (s, e) =>
             {
                 if (nameTextBox.Text == "Имя") nameTextBox.Text = "";
@@ -62,17 +62,7 @@ namespace GoupExam
                 if (string.IsNullOrWhiteSpace(nameTextBox.Text)) nameTextBox.Text = "Имя";
             };
 
-            var ageTextBox = new TextBox { Text = "Возраст", Margin = new Thickness(0, 5, 0, 5) };
-            ageTextBox.GotFocus += (s, e) =>
-            {
-                if (ageTextBox.Text == "Возраст") ageTextBox.Text = "";
-            };
-            ageTextBox.LostFocus += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(ageTextBox.Text)) ageTextBox.Text = "Возраст";
-            };
-
-            var heightTextBox = new TextBox { Text = "Рост (см)", Margin = new Thickness(0, 5, 0, 5) };
+            var heightTextBox = new TextBox {Text = "Рост (см)", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0))};
             heightTextBox.GotFocus += (s, e) =>
             {
                 if (heightTextBox.Text == "Рост (см)") heightTextBox.Text = "";
@@ -82,7 +72,7 @@ namespace GoupExam
                 if (string.IsNullOrWhiteSpace(heightTextBox.Text)) heightTextBox.Text = "Рост (см)";
             };
 
-            var weightTextBox = new TextBox { Text = "Вес (кг)", Margin = new Thickness(0, 5, 0, 5) };
+            var weightTextBox = new TextBox {Text = "Вес (кг)", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
             weightTextBox.GotFocus += (s, e) =>
             {
                 if (weightTextBox.Text == "Вес (кг)") weightTextBox.Text = "";
@@ -92,19 +82,29 @@ namespace GoupExam
                 if (string.IsNullOrWhiteSpace(weightTextBox.Text)) weightTextBox.Text = "Вес (кг)";
             };
 
-            var genderComboBox = new ComboBox { Margin = new Thickness(0, 5, 0, 5) };
+            var AgeTextBox = new TextBox {Text = "Возраст(год)", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            AgeTextBox.GotFocus += (s, e) =>
+            {
+                if (AgeTextBox.Text == "Возраст(год)") AgeTextBox.Text = "";
+            };
+            AgeTextBox.LostFocus += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(AgeTextBox.Text)) AgeTextBox.Text = "Возраст(год)";
+            };
+
+            var genderComboBox = new ComboBox { Margin = new Thickness(0, 5, 0, 5)};
             genderComboBox.Items.Add("Мужской");
             genderComboBox.Items.Add("Женский");
 
-            var bodyTypeComboBox = new ComboBox { Margin = new Thickness(0, 5, 0, 5) };
+            var bodyTypeComboBox = new ComboBox { Margin = new Thickness(0, 5, 0, 5)};
             bodyTypeComboBox.Items.Add("Долихоморфный");
             bodyTypeComboBox.Items.Add("Мезоморфный");
             bodyTypeComboBox.Items.Add("Брахиморфный");
 
             var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -10, 0, -10) };
 
-            // Помечаем обработчик события как async
-            submitButton.Click += async (s, args) =>
+            var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(10, 10, 10, -5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            submitButton.Click += (s, args) =>
             {
                 if (!string.IsNullOrEmpty(nameTextBox.Text) &&
                     nameTextBox.Text != "Имя" &&
@@ -258,13 +258,13 @@ namespace GoupExam
         private void ButtonDiet_Click(object sender, RoutedEventArgs e)
         {
             CentralArea.Children.Clear();
-
+            //Foreground = "#FF028C2F" Background = "#FFB2E100"
             var stackPanel = new StackPanel();
-            var radioButton1 = new RadioButton { Content = "Уменьшение веса", Margin = new Thickness(0, 5, 0, 5) };
-            var radioButton2 = new RadioButton { Content = "Увеличение веса", Margin = new Thickness(0, 5, 0, 5) };
-            var radioButton3 = new RadioButton { Content = "Сохранение веса", Margin = new Thickness(0, 5, 0, 5) };
+            var radioButton1 = new RadioButton { Content = "Уменьшение веса", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2,140,47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            var radioButton2 = new RadioButton { Content = "Увеличение веса", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            var radioButton3 = new RadioButton {Content = "Сохранение веса", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
 
-            var submitButton = new Button { Content = "Подтвердить", Margin = new Thickness(0, 10, 0, 0) };
+            var submitButton = new Button { Content = "Подтвердить", Margin = new Thickness(0, 10, 0, 0), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
             submitButton.Click += (s, args) =>
             {
                 string selectedOption = null;
@@ -304,7 +304,7 @@ namespace GoupExam
                                    $"Ваша дневная норма калорий ({goal}): {CalorieCalculator.Calculate_CaloriesNorm(CalorieCalculator.Calculate_CaloriesNeed(CalorieCalculator.Calculate_CaloriesConsupshion(age, weight, height, gender), 1.2), goal)} ккал/день";
 
                 CentralArea.Children.Clear();
-                CentralArea.Children.Add(new TextBlock { Text = caloriesInfo, FontSize = 16, TextWrapping = TextWrapping.Wrap });
+                CentralArea.Children.Add(new TextBlock { Text = caloriesInfo, FontSize = 16, TextWrapping = TextWrapping.Wrap, Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) });
             };
 
             stackPanel.Children.Add(radioButton1);
@@ -321,11 +321,10 @@ namespace GoupExam
         {
             CentralArea.Children.Clear();
             var stackPanel = new StackPanel();
-
-            // Поле для ввода названия продукта
-            var searchBox = new TextBox { Text = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
-            var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
-            var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
+            var searchBox = new TextBox {Text = "", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            var searchButton = new Button {Content = "Найти", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            //// Поле для ввода названия продукта
 
             searchButton.Click += async (s, args) =>
             {
