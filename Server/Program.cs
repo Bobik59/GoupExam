@@ -54,7 +54,7 @@ class Program // сервер
             Console.WriteLine("Ответ сервера: " + response);
 
             // Отправляем ответ клиенту
-            byte[] responseBytes = Encoding.UTF8.GetBytes(response ?? "Продукт не найден");
+            byte[] responseBytes = Encoding.UTF8.GetBytes(response ?? "Продукт не найден");//
             networkStream.Write(responseBytes, 0, responseBytes.Length);
             Console.WriteLine("Ответ отправлен клиенту.");
         }
