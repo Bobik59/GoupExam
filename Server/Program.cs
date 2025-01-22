@@ -117,7 +117,8 @@ class Program // сервер
                                 string fat = product["nutriments"]?["fat_100g"]?.ToString() ?? "Нет данных";
                                 string carbs = product["nutriments"]?["carbohydrates_100g"]?.ToString() ?? "Нет данных";
                                 string categories = product["categories"]?.ToString() ?? "Нет данных";
-                                string grams = product?["quantity"]?.ToString().Replace("g", ""); ;
+                                string grams = product?["quantity"]?.ToString().Replace("g", "");
+                                grams = grams.Replace("g", "").Replace("mL", "").Trim();
 
                                 decimal calories1 = decimal.TryParse(calories, out var cal) ? cal : 0;
                                 decimal protein1 = decimal.TryParse(protein, out var pro) ? pro : 0;
@@ -151,11 +152,12 @@ class Program // сервер
                                 context.SaveChanges();
 
                                 Console.WriteLine("Продукт успешно добавлен в базу данных.");
-                                
+
                             }
                         }
                         else
                         {
+                            SearchData(productName);
                             Console.WriteLine($"Ошибка запроса: {response.StatusCode}");
                         }
                     }
@@ -166,6 +168,32 @@ class Program // сервер
                 }
             }
             return productInfo;
+        }
+
+        static async Task AddUser(string UserData)
+        {
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseSqlServer(connectionString)
+            .Options;
+            using (var context = new ApplicationDbContext(options))
+            {
+                string[] parts = UserData.Split(',');
+                string name = parts[0];
+                int year = int.Parse(parts[1]);
+                decimal weight = decimal.Parse(parts[2], CultureInfo.InvariantCulture);
+                decimal height = decimal.Parse(parts[3], CultureInfo.InvariantCulture);
+
+                var user = new User
+                {
+                    Name = name,
+                    Year = year,
+                    Weight = weight,
+                    Height = height,
+                };
+                context.Users.Add(user);
+
+                context.SaveChanges();
+            }
         }
     }
 }
