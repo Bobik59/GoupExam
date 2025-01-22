@@ -54,6 +54,16 @@ namespace GoupExam
                 if (string.IsNullOrWhiteSpace(nameTextBox.Text)) nameTextBox.Text = "Имя";
             };
 
+            var ageTextBox = new TextBox { Text = "Возраст", Margin = new Thickness(0, 5, 0, 5) };
+            ageTextBox.GotFocus += (s, e) =>
+            {
+                if (ageTextBox.Text == "Возраст") ageTextBox.Text = "";
+            };
+            ageTextBox.LostFocus += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(ageTextBox.Text)) ageTextBox.Text = "Возраст";
+            };
+
             var heightTextBox = new TextBox { Text = "Рост (см)", Margin = new Thickness(0, 5, 0, 5) };
             heightTextBox.GotFocus += (s, e) =>
             {
@@ -84,10 +94,14 @@ namespace GoupExam
             bodyTypeComboBox.Items.Add("Брахиморфный");
 
             var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -10, 0, -10) };
-            submitButton.Click += (s, args) =>
+
+            // Помечаем обработчик события как async
+            submitButton.Click += async (s, args) =>
             {
                 if (!string.IsNullOrEmpty(nameTextBox.Text) &&
                     nameTextBox.Text != "Имя" &&
+                    !string.IsNullOrEmpty(ageTextBox.Text) &&
+                    ageTextBox.Text != "Возраст" &&
                     !string.IsNullOrEmpty(heightTextBox.Text) &&
                     heightTextBox.Text != "Рост (см)" &&
                     !string.IsNullOrEmpty(weightTextBox.Text) &&
@@ -95,7 +109,14 @@ namespace GoupExam
                     genderComboBox.SelectedItem != null &&
                     bodyTypeComboBox.SelectedItem != null)
                 {
-                    File.WriteAllText("user_data.txt", $"Имя: {nameTextBox.Text}\nРост: {heightTextBox.Text}\nВес: {weightTextBox.Text}\nПол: {genderComboBox.SelectedItem}\nТип телосложения: {bodyTypeComboBox.SelectedItem}");
+                    File.WriteAllText("user_data.txt", $"Имя: {nameTextBox.Text}\nВозраст: {ageTextBox.Text}\nРост: {heightTextBox.Text}\nВес: {weightTextBox.Text}\nПол: {genderComboBox.SelectedItem}\nТип телосложения: {bodyTypeComboBox.SelectedItem}");
+
+                    // Формируем строку для метода
+                    string searchQuery = $"user: {nameTextBox.Text},{ageTextBox.Text},{weightTextBox.Text},{heightTextBox.Text}";
+
+                    // Вызываем метод SearchProductsAsync
+                    await SearchProductsAsync(searchQuery);
+
                     MessageBox.Show("Данные сохранены!");
                     ButtonProducts.IsEnabled = true;
                     ButtonDiet.IsEnabled = true;
@@ -107,6 +128,7 @@ namespace GoupExam
             };
 
             stackPanel.Children.Add(nameTextBox);
+            stackPanel.Children.Add(ageTextBox);
             stackPanel.Children.Add(heightTextBox);
             stackPanel.Children.Add(weightTextBox);
             stackPanel.Children.Add(genderComboBox);
@@ -198,7 +220,7 @@ namespace GoupExam
                 try
                 {
                     // Асинхронное взаимодействие с сервером
-                    var response = await SearchProductsAsync(searchQuery);
+                    var response = await SearchProductsAsync("product:"+searchQuery);
                     productList.Items.Add(response);
                 }
                 catch (Exception ex)
@@ -223,7 +245,7 @@ namespace GoupExam
                 using (var networkStream = client.GetStream())
                 {
                     // Отправляем сообщение серверу
-                    byte[] messageBytes = Encoding.UTF8.GetBytes("product:"+searchQuery);
+                    byte[] messageBytes = Encoding.UTF8.GetBytes(searchQuery);
                     await networkStream.WriteAsync(messageBytes, 0, messageBytes.Length);
 
                     Console.WriteLine("Сообщение отправлено.");

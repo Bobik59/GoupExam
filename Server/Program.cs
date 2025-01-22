@@ -13,6 +13,33 @@ class Program // сервер
 {
     private static readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Calories;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
 
+
+    static async Task AddUser(string UserData)
+    {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        .UseSqlServer(connectionString)
+        .Options;
+        using (var context = new ApplicationDbContext(options))
+        {
+            string[] parts = UserData.Split(',');
+            string name = parts[0];
+            int year = int.Parse(parts[1]);
+            decimal weight = decimal.Parse(parts[2], CultureInfo.InvariantCulture);
+            decimal height = decimal.Parse(parts[3], CultureInfo.InvariantCulture);
+
+            var user = new User
+            {
+                Name = name,
+                Year = year,
+                Weight = weight,
+                Height = height,
+            };
+            context.Users.Add(user);
+
+            context.SaveChanges();
+        }
+    }
+
     static async Task Main()
     {
         // Устанавливаем IP-адрес и порт для сервера
@@ -53,7 +80,8 @@ class Program // сервер
 
             if (receivedData.StartsWith("user:", StringComparison.OrdinalIgnoreCase))
             {
-                
+                await AddUser(dataReceived.Substring(5).Trim());
+                Console.WriteLine("Ответ сервера: " + response);
             }
             else if (receivedData.StartsWith("product:", StringComparison.OrdinalIgnoreCase))
             {
@@ -170,30 +198,5 @@ class Program // сервер
             return productInfo;
         }
 
-        static async Task AddUser(string UserData)
-        {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlServer(connectionString)
-            .Options;
-            using (var context = new ApplicationDbContext(options))
-            {
-                string[] parts = UserData.Split(',');
-                string name = parts[0];
-                int year = int.Parse(parts[1]);
-                decimal weight = decimal.Parse(parts[2], CultureInfo.InvariantCulture);
-                decimal height = decimal.Parse(parts[3], CultureInfo.InvariantCulture);
-
-                var user = new User
-                {
-                    Name = name,
-                    Year = year,
-                    Weight = weight,
-                    Height = height,
-                };
-                context.Users.Add(user);
-
-                context.SaveChanges();
-            }
-        }
     }
 }
