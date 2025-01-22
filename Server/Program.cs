@@ -19,7 +19,7 @@ class Program // сервер
         var ipAddress = IPAddress.Any;
         var port = 12345;
         var endpoint = new IPEndPoint(ipAddress, port);
-
+        
         // Создаем TCP-сервер
         var listener = new TcpListener(endpoint);
         listener.Start();
