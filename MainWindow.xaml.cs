@@ -10,6 +10,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
+using Server.DataBase;
 //using Server.Models;  
 
 
@@ -17,6 +19,8 @@ namespace GoupExam
 {
     public partial class MainWindow : Window
     {
+        private string ipAddress = "127.0.0.1"; // Локальный адрес
+        private int port = 12345;
         private int totalCalories = 0;
 
         public MainWindow()
@@ -177,61 +181,58 @@ namespace GoupExam
         private void ButtonProducts_Click(object sender, RoutedEventArgs e)
         {
             CentralArea.Children.Clear();
+            var stackPanel = new StackPanel();
 
-            //var stackPanel = new StackPanel();
+            // Поле для ввода названия продукта
+            var searchBox = new TextBox { Text = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
+            var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
+            var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
 
-            //// Поле для ввода названия продукта
-            //var searchBox = new TextBox { Text = "Введите название продукта", Margin = new Thickness(0, 5, 0, 5) };
-            //var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
-            //var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
+            searchButton.Click += (s, args) =>
+            {
+                productList.Items.Clear();
 
-            //searchButton.Click += (s, args) =>
-            //{
-            //    productList.Items.Clear();
+                // Здесь выполняется поиск продуктов по базе данных
+                var searchQuery = searchBox.Text;
 
-            //    // Здесь выполняется поиск продуктов по базе данных
-            //    var searchQuery = searchBox.Text;
-            //    var products = GetProductsFromDatabase(searchQuery);
+                try
+                {
+                    // Создаем TCP-клиент и подключаемся к серверу
+                    var client = new TcpClient(ipAddress, port);
 
-            //    if (products.Any())
-            //    {
-            //        foreach (var product in products)
-            //        {
-            //            var button = new Button { Content = $"{product.Name} ({product.CaloriesPer100g} ккал на 100г)", Margin = new Thickness(0, 5, 0, 5) };
-            //            button.Click += (s, args) =>
-            //            {
-            //                ProductList.Items.Add($"{product.Name} - {product.CaloriesPer100g} ккал на 100г");
-            //                totalCalories += (int)product.CaloriesPer100g;
-            //                TotalCalories.Text = totalCalories.ToString();
-            //            };
-            //            productList.Items.Add(button);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Продукт не найден!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            //    }
-            //};
+                    // Получаем поток для чтения и записи
+                    var networkStream = client.GetStream();
 
-            //stackPanel.Children.Add(searchBox);
-            //stackPanel.Children.Add(searchButton);
-            //stackPanel.Children.Add(productList);
+                    // Цикл обмена сообщениями
+                    while (true)
+                    {
 
-            //CentralArea.Children.Add(stackPanel);
+                        // Отправляем сообщение серверу
+                        byte[] messageBytes = Encoding.UTF8.GetBytes(searchQuery);
+                        networkStream.Write(messageBytes, 0, messageBytes.Length);
+                        Console.WriteLine("Сообщение отправлено.");
+
+                        // Читаем ответ от сервера
+                        byte[] buffer = new byte[1024];
+                        int bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+                        string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                        ProductList.Items.Add(response);
+                    }
+                    client.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Произошла ошибка: " + ex.Message);
+                }
+            };
+
+            stackPanel.Children.Add(searchBox);
+            stackPanel.Children.Add(searchButton);
+            stackPanel.Children.Add(productList);
+
+            CentralArea.Children.Add(stackPanel);
         }
 
-        // Метод для загрузки данных из базы данных
-        //private IEnumerable<Product> GetProductsFromDatabase(string query)
-        //{
-        //    // Пример данных, замените на реальный запрос к базе данных
-        //    var sampleProducts = new List<Product>
-        //{
-        //    new Product { ProductId = 1, Name = "Морковь", Category = "Овощи", CaloriesPer100g = 35, ProteinPer100g = 0.8m, FatPer100g = 0.1m, CarbsPer100g = 6.7m },
-        //    new Product { ProductId = 2, Name = "Гречка", Category = "Крупы", CaloriesPer100g = 329, ProteinPer100g = 12.6m, FatPer100g = 3.3m, CarbsPer100g = 62.1m }
-        //};
-
-        //    return sampleProducts.Where(p => p.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
-        //}
 
         private void RemoveProduct_Click(object sender, RoutedEventArgs e)
         {
