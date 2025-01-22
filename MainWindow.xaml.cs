@@ -188,7 +188,7 @@ namespace GoupExam
             var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
             var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
 
-            searchButton.Click += (s, args) =>
+            searchButton.Click += async (s, args) =>
             {
                 productList.Items.Clear();
 
@@ -197,28 +197,9 @@ namespace GoupExam
 
                 try
                 {
-                    // Создаем TCP-клиент и подключаемся к серверу
-                    var client = new TcpClient(ipAddress, port);
-
-                    // Получаем поток для чтения и записи
-                    var networkStream = client.GetStream();
-
-                    // Цикл обмена сообщениями
-                    while (true)
-                    {
-
-                        // Отправляем сообщение серверу
-                        byte[] messageBytes = Encoding.UTF8.GetBytes(searchQuery);
-                        networkStream.Write(messageBytes, 0, messageBytes.Length);
-                        Console.WriteLine("Сообщение отправлено.");
-
-                        // Читаем ответ от сервера
-                        byte[] buffer = new byte[1024];
-                        int bytesRead = networkStream.Read(buffer, 0, buffer.Length);
-                        string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        ProductList.Items.Add(response);
-                    }
-                    client.Close();
+                    // Асинхронное взаимодействие с сервером
+                    var response = await SearchProductsAsync(searchQuery);
+                    productList.Items.Add(response);
                 }
                 catch (Exception ex)
                 {
@@ -232,6 +213,32 @@ namespace GoupExam
 
             CentralArea.Children.Add(stackPanel);
         }
+        private async Task<string> SearchProductsAsync(string searchQuery)
+        {
+
+            using (var client = new TcpClient())
+            {
+                await client.ConnectAsync(ipAddress, port); // Асинхронное подключение к серверу
+
+                using (var networkStream = client.GetStream())
+                {
+                    // Отправляем сообщение серверу
+                    byte[] messageBytes = Encoding.UTF8.GetBytes("product:"+searchQuery);
+                    await networkStream.WriteAsync(messageBytes, 0, messageBytes.Length);
+
+                    Console.WriteLine("Сообщение отправлено.");
+
+                    // Читаем ответ от сервера
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
+                    string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                    return response;
+                }
+            }
+        }
+
+
 
 
         private void RemoveProduct_Click(object sender, RoutedEventArgs e)
