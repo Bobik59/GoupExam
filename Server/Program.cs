@@ -79,7 +79,7 @@ class Program // сервер
             .Options;
         using (var context = new ApplicationDbContext(options))
         {
-            context.Database.EnsureCreatedAsync();
+            context.Database.EnsureCreated();
             var producter = context.Products
                     .FirstOrDefault(p => p.Name.ToLower() == productName.ToLower());
 
