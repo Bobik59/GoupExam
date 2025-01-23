@@ -103,7 +103,7 @@ namespace GoupExam
 
             var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -10, 0, -10) };
 
-            var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(10, 10, 10, -5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
+            
             submitButton.Click += (s, args) =>
             {
                 if (!string.IsNullOrEmpty(nameTextBox.Text) &&
