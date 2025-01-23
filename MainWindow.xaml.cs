@@ -12,7 +12,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using Server.DataBase;
-
+using System.Globalization;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Security.Policy;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 //using Server.Models;  
 
 
@@ -141,6 +145,114 @@ namespace GoupExam
 
             CentralArea.Children.Add(stackPanel);
         }
+
+        public static (string Name, double Number)? ParseData(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+
+            // Разделяем строку на части
+            var parts = input.Split(new[] { ' ', ',', ';', '\t', ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Если в строке меньше двух частей, данные некорректны
+            if (parts.Length < 2)
+            {
+                return null;
+            }
+
+            // Последняя часть - число
+            string numberPart = parts[^1];
+
+            // Всё до последней части - название
+            string name = string.Join(" ", parts, 0, parts.Length - 1).Trim();
+
+            if (double.TryParse(numberPart, NumberStyles.Any, CultureInfo.InvariantCulture, out double number))
+            {
+                return (name, number);
+            }
+
+            return null;
+        }
+
+
+        private void ButtonMenu_Click(object sender, RoutedEventArgs e)
+        {
+            CentralArea.Children.Clear();
+
+            // Создание элементов для интерфейса
+            var stackPanel = new StackPanel();
+            string InfoProducts = null;
+            var textBox = new TextBox { Margin = new Thickness(0, 5, 0, 5), Width = 300, Height = 30, Text = "Введите данные" };
+            var addButton = new Button { Content = "Добавить", Margin = new Thickness(0, 10, 0, 10), Width = 100, Height = 30 };
+            var listBox = new ListBox { Margin = new Thickness(0, 10, 0, 10), Width = 300, Height = 150 };
+
+            // Логика добавления данных в список
+            addButton.Click += async (s, args) =>
+            {
+                if (!string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    var result = ParseData(textBox.Text);
+                    string apiUrl = "https://world.openfoodfacts.org/cgi/search.pl";
+                    string query = result.Value.Name;
+                    int pageSize = 1;
+
+                    string url = $"{apiUrl}?search_terms={query}&page_size={pageSize}&json=true";
+                    using (HttpClient client = new HttpClient())
+                    {
+                        try
+                        {
+                            HttpResponseMessage response = await client.GetAsync(url);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                                // Парсинг JSON-ответа
+                                JObject data = JObject.Parse(jsonResponse);
+
+                                foreach (var product in data["products"])
+                                {
+                                    string name = result.Value.Name.Split(' ')[0];
+                                    string calories = product["nutriments"]?["energy-kcal_100g"]?.ToString() ?? "Нет данных";
+                                    string grams = product?["quantity"]?.ToString().Replace("g", "");
+                                    grams = grams.Replace("g", "").Replace("mL", "").Trim();
+
+                                    double calories1 = double.TryParse(calories, out var cal) ? cal : 0;
+                                    double grams1 = double.TryParse(grams, out var g) ? g : 0;
+
+                                    double roundedNumber = Math.Round((calories1 / grams1) * result.Value.Number, 2);
+                                    InfoProducts = $"{name} {roundedNumber}calloria, {result.Value.Number}gramm ";
+
+
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Ошибка: {ex.Message}");
+                        }
+                    }
+                    listBox.Items.Add(InfoProducts);
+                    textBox.Clear();
+                }
+                else
+                {
+                    MessageBox.Show("Введите данные перед добавлением.");
+                }
+            };
+
+            // Добавление элементов в StackPanel
+            stackPanel.Children.Add(textBox);
+            stackPanel.Children.Add(addButton);
+            stackPanel.Children.Add(listBox);
+
+            // Добавление StackPanel в центральную область
+            CentralArea.Children.Add(stackPanel);
+        }
+
+
 
         // Добавление рекомендаций по диете
         private void ButtonDiet_Click(object sender, RoutedEventArgs e)

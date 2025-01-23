@@ -39,7 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="NetworkCore\TopNetwork.csproj" />
     <ProjectReference Include="Server\Server.csproj" />
   </ItemGroup>
 

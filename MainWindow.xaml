@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GoupExam"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1000">
+        Title="MainWindow" Height="550" Width="1000">
     <Grid>
         <!-- Основная разметка с тремя областями -->
         <Grid.ColumnDefinitions>
@@ -19,6 +19,7 @@
 
         <!-- Левая панель -->
         <StackPanel Grid.Column="0" Margin="10,10,10,10">
+            <Button x:Name="ButtonMenu" Content="Меню" Height="40" Margin="0,10" Click="ButtonMenu_Click"/>
             <Button x:Name="ButtonProducts" Content="Продукты" Height="40" Margin="0,10" IsEnabled="False" Click="ButtonProducts_Click"/>
             <Button x:Name="ButtonDiet" Content="Выбор цели" Height="40" Margin="0,10" IsEnabled="False" Click="ButtonDiet_Click"/>
             <Button x:Name="ButtonForm" Content="Анкета" Height="40" Margin="0,10" Click="ButtonForm_Click"/>
@@ -26,9 +27,8 @@
 
         <!-- Центральная область -->
         <Border Grid.Column="1" Margin="10,10,205,10" BorderBrush="Gray" BorderThickness="1" Grid.ColumnSpan="2">
-            <Grid x:Name="CentralArea" Margin="9,1,-1,-1">
+            <Grid x:Name="CentralArea" Margin="4,1,4,-1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="165*"/>
                     <RowDefinition Height="247*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Добро пожаловать! Выберите действие слева." FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Margin="0,70,0,0" Width="365" />
