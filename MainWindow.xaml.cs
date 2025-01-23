@@ -353,7 +353,7 @@ namespace GoupExam
 
             using (var client = new TcpClient())
             {
-                await client.ConnectAsync(ipAddress, port); // Асинхронное подключение к серверу
+                await client.ConnectAsync(serverAddress, serverPort); // Асинхронное подключение к серверу
 
                 using (var networkStream = client.GetStream())
                 {
