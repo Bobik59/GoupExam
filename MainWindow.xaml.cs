@@ -24,8 +24,8 @@ namespace GoupExam
 {
     public partial class MainWindow : Window
     {
-        private string ipAddress = "127.0.0.1"; // Локальный адрес
-        private int port = 12345;
+        private const string serverAddress = "127.0.0.1";
+        private const int serverPort = 12345;
         private int totalCalories = 0;
 
         public MainWindow()
