@@ -42,8 +42,17 @@ class Program // сервер
 
     static async Task Main()
     {
-        // Устанавливаем IP-адрес и порт для сервера
-        var ipAddress = IPAddress.Any;
+
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        .UseSqlServer(connectionString)
+        .Options;
+
+        using (var context = new ApplicationDbContext(options))
+        {
+            context.Database.EnsureCreated();
+        }
+            // Устанавливаем IP-адрес и порт для сервера
+            var ipAddress = IPAddress.Any;
         var port = 12345;
         var endpoint = new IPEndPoint(ipAddress, port);
         
@@ -138,7 +147,7 @@ class Program // сервер
 
             if (producter != null)
             {
-                productInfo = ($"Имя: {producter.Name}, Категория: {producter.Category}, Калории: {producter.CaloriesPer100g} ккал на 100г, Белки: {producter.ProteinPer100g} г, Жиры: {producter.FatPer100g} г, Углеводы: {producter.CarbsPer100g} г");
+                productInfo = ($"Имя: {producter.Name}, Категория: {producter.Category}, Калории: {producter.CaloriesPer100g} ккал, Белки: {producter.ProteinPer100g} г, Жиры: {producter.FatPer100g} г, Углеводы: {producter.CarbsPer100g} г");
             }
             else
             {
@@ -180,7 +189,7 @@ class Program // сервер
                                 decimal grams1 = decimal.TryParse(grams, out var g) ? g : 0;
 
 
-                                productInfo = ($"Имя: {name}, Категория: {categories}, Калории: {calories1} ккал на 100г, Белки: {protein1} г, Жиры: {fat1} г, Углеводы: {carbs1} г");
+                                productInfo = ($"Имя: {name}, Категория: {categories}, Калории: {calories1}, Белки: {protein1} г, Жиры: {fat1} г, Углеводы: {carbs1} г");
                                 //Второе подключение к базе, второе создание контекста на один метод
 
                                 // Убедитесь, что база данных создана

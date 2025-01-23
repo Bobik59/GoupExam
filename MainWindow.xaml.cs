@@ -338,6 +338,7 @@ namespace GoupExam
                     // Асинхронное взаимодействие с сервером
                     var response = await SearchProductsAsync("product:"+searchQuery);
                     productList.Items.Add(response);
+                    
                 }
                 catch (Exception ex)
                 {
