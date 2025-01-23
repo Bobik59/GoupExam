@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using Server.DataBase;
+
 //using Server.Models;  
 
 
@@ -19,6 +20,7 @@ namespace GoupExam
 {
     public partial class MainWindow : Window
     {
+        
         private string ipAddress = "127.0.0.1"; // Локальный адрес
         private int port = 12345;
         private int totalCalories = 0;
@@ -27,6 +29,8 @@ namespace GoupExam
         {
             InitializeComponent();
             CheckForUserFile();
+          
+           
         }
 
         private void CheckForUserFile()
@@ -177,6 +181,7 @@ namespace GoupExam
 
                 // Загрузка данных пользователя
                 var userData = File.ReadAllLines("user_data.txt");
+                //var userName = (userData.FirstOrDefault(line => line.StartsWith("Имя:"))?.Split(':')[1] ?? "0");
                 var weight = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Вес:"))?.Split(':')[1] ?? "0");
                 var height = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Рост:"))?.Split(':')[1] ?? "0");
                 var gender = userData.FirstOrDefault(line => line.StartsWith("Пол:"))?.Split(':')[1]?.Trim() ?? "";
