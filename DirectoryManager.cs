@@ -9,6 +9,7 @@ using System.Windows.Shapes;
 
 namespace GoupExam
 {
+
     public class DirectoryManager
     {
         public static string p;
