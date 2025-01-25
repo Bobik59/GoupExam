@@ -12,13 +12,14 @@ using System.Text;
 class Program // сервер 
 {
     private static readonly string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Calories;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
-
+    private static string NameUser;
 
     static async Task AddUser(string UserData)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-        .UseSqlServer(connectionString)
-        .Options;
+            .UseSqlServer(connectionString)
+            .Options;
+
         using (var context = new ApplicationDbContext(options))
         {
             string[] parts = UserData.Split(',');
@@ -27,6 +28,15 @@ class Program // сервер
             decimal weight = decimal.Parse(parts[2], CultureInfo.InvariantCulture);
             decimal height = decimal.Parse(parts[3], CultureInfo.InvariantCulture);
 
+            // Проверяем, существует ли пользователь с таким именем
+            bool userExists = await context.Users.AnyAsync(u => u.Name == name);
+
+            if (userExists)
+            {
+                NameUser = name;
+                return;
+            }
+
             var user = new User
             {
                 Name = name,
@@ -34,9 +44,10 @@ class Program // сервер
                 Weight = weight,
                 Height = height,
             };
+            NameUser = user.Name;
             context.Users.Add(user);
-
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+            Console.WriteLine($"Пользователь {name} успешно добавлен в базу данных.");
         }
     }
 
