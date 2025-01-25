@@ -40,73 +40,87 @@ class Program // сервер
         }
     }
 
+    static async Task HandleClient(TcpClient client)
+    {
+        try
+        {
+            using var networkStream = client.GetStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            string response = null;
+
+            while (true) // Внутренний цикл для обработки сообщений от клиента
+            {
+                bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0)
+                {
+                    Console.WriteLine("Клиент отключился.");
+                    break;
+                }
+
+                string receivedData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine("Получено от клиента: " + receivedData);
+
+                if (receivedData.StartsWith("user:", StringComparison.OrdinalIgnoreCase))
+                {
+                    await AddUser(receivedData.Substring(5).Trim());
+                    response = "Пользователь добавлен";
+                }
+                else if (receivedData.StartsWith("product:", StringComparison.OrdinalIgnoreCase))
+                {
+                    response = await SearchData(receivedData.Substring(8).Trim());
+                }
+                else
+                {
+                    response = "Неизвестная команда";
+                }
+
+                // Отправляем ответ клиенту
+                byte[] responseBytes = Encoding.UTF8.GetBytes(response ?? "Ошибка обработки");
+                await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+                Console.WriteLine("Ответ отправлен клиенту.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка: " + ex.Message);
+        }
+        finally
+        {
+            client.Close();
+        }
+    }
+
     static async Task Main()
     {
-
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-        .UseSqlServer(connectionString)
-        .Options;
+            .UseSqlServer(connectionString)
+            .Options;
 
         using (var context = new ApplicationDbContext(options))
         {
             context.Database.EnsureCreated();
         }
-            // Устанавливаем IP-адрес и порт для сервера
-            var ipAddress = IPAddress.Any;
+
+        // Устанавливаем IP-адрес и порт для сервера
+        var ipAddress = IPAddress.Any;
         var port = 12345;
         var endpoint = new IPEndPoint(ipAddress, port);
-        
+
         // Создаем TCP-сервер
         var listener = new TcpListener(endpoint);
         listener.Start();
-        Console.WriteLine("Ожидаю подключения клиента...");
+        Console.WriteLine("Сервер запущен и ожидает подключения клиентов...");
 
-        // Ожидаем подключения клиента
-        var client = listener.AcceptTcpClient();
-        Console.WriteLine("Клиент подключен.");
-        
-        // Получаем поток для чтения и записи
-        var networkStream = client.GetStream();
-
-        // Цикл обмена сообщениями
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        string response = null;
-        while (true)
+        while (true) // Внешний цикл для поддержки работы сервера
         {
-            // Чтение данных от клиента
-            bytesRead = networkStream.Read(buffer, 0, buffer.Length);
-            if (bytesRead == 0)
-            {
-                Console.WriteLine("Клиент отключился.");
-                break; // Клиент закрыл соединение
-            }
-            string receivedData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            Console.WriteLine("Ожидаю подключения клиента...");
+            var client = await listener.AcceptTcpClientAsync(); // Асинхронное ожидание подключения клиента
+            Console.WriteLine("Клиент подключен.");
 
-
-            string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            Console.WriteLine("Получено от клиента: " + dataReceived);
-
-            if (receivedData.StartsWith("user:", StringComparison.OrdinalIgnoreCase))
-            {
-                await AddUser(dataReceived.Substring(5).Trim());
-                Console.WriteLine("Ответ сервера: " + response);
-            }
-            else if (receivedData.StartsWith("product:", StringComparison.OrdinalIgnoreCase))
-            {
-                // Обрабатываем запрос и дожидаемся результата
-                response = await SearchData(dataReceived.Substring(8).Trim());
-                Console.WriteLine("Ответ сервера: " + response);
-            }
-
-            // Отправляем ответ клиенту
-            byte[] responseBytes = Encoding.UTF8.GetBytes(response ?? "Продукт не найден");
-            networkStream.Write(responseBytes, 0, responseBytes.Length);
-            Console.WriteLine("Ответ отправлен клиенту.");
+            // Обрабатываем клиента в отдельной задаче
+            _ = Task.Run(() => HandleClient(client));
         }
-        // Закрываем соединение
-        client.Close();
-        listener.Stop();
     }
 
     public static void CreateFile(string path, string type, string response, double weight, double height, string gender)
