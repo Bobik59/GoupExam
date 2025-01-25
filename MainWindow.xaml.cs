@@ -257,9 +257,9 @@ namespace GoupExam
             CentralArea.Children.Clear();
 
             var stackPanel = new StackPanel();
-            var radioButton1 = new RadioButton { Content = "Уменьшение веса", Margin = new Thickness(0, 5, 0, 5) };
-            var radioButton2 = new RadioButton { Content = "Увеличение веса", Margin = new Thickness(0, 5, 0, 5) };
-            var radioButton3 = new RadioButton { Content = "Сохранение веса", Margin = new Thickness(0, 5, 0, 5) };
+            var radioButton1 = new RadioButton{Content = "Уменьшение веса",Margin = new Thickness(0, 5, 0, 5),Foreground = new SolidColorBrush(Colors.Lime)};
+            var radioButton2 = new RadioButton{Content = "Увеличение веса", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Colors.Lime)};
+            var radioButton3 = new RadioButton{Content = "Сохранение веса", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Colors.Lime)};
 
             var submitButton = new Button { Content = "Подтвердить", Margin = new Thickness(0, 10, 0, 0) };
             submitButton.Click += (s, args) =>
@@ -290,10 +290,11 @@ namespace GoupExam
 
                 // Загрузка данных пользователя
                 var userData = File.ReadAllLines("user_data.txt");
+
                 var weight = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Вес:"))?.Split(':')[1] ?? "0");
                 var height = double.Parse(userData.FirstOrDefault(line => line.StartsWith("Рост:"))?.Split(':')[1] ?? "0");
                 var gender = userData.FirstOrDefault(line => line.StartsWith("Пол:"))?.Split(':')[1]?.Trim() ?? "";
-                var age = 30; // Здесь можно добавить поле для ввода возраста в будущем
+                var age = 30;
 
                 var caloriesInfo = $"Ваш дневной расход калорий для поддержания жизнедеятельности: {CalorieCalculator.Calculate_CaloriesConsupshion(age, weight, height, gender)} ккал/день\n" +
                                    $"Потребность в калориях с учетом активности: {CalorieCalculator.Calculate_CaloriesNeed(CalorieCalculator.Calculate_CaloriesConsupshion(age, weight, height, gender), 1.2)} ккал/день\n" +
