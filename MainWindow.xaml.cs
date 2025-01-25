@@ -104,12 +104,12 @@ namespace GoupExam
             var submitButton = new Button { Content = "Сохранить", Margin = new Thickness(0, -10, 0, -10) };
 
             
-            submitButton.Click += (s, args) =>
+            submitButton.Click += async (s, args) =>
             {
                 if (!string.IsNullOrEmpty(nameTextBox.Text) &&
                     nameTextBox.Text != "Имя" &&
-                    !string.IsNullOrEmpty(ageTextBox.Text) &&
-                    ageTextBox.Text != "Возраст" &&
+                    !string.IsNullOrEmpty(AgeTextBox.Text) &&
+                    AgeTextBox.Text != "Возраст" &&
                     !string.IsNullOrEmpty(heightTextBox.Text) &&
                     heightTextBox.Text != "Рост (см)" &&
                     !string.IsNullOrEmpty(weightTextBox.Text) &&
@@ -117,10 +117,10 @@ namespace GoupExam
                     genderComboBox.SelectedItem != null &&
                     bodyTypeComboBox.SelectedItem != null)
                 {
-                    File.WriteAllText("user_data.txt", $"Имя: {nameTextBox.Text}\nВозраст: {ageTextBox.Text}\nРост: {heightTextBox.Text}\nВес: {weightTextBox.Text}\nПол: {genderComboBox.SelectedItem}\nТип телосложения: {bodyTypeComboBox.SelectedItem}");
+                    File.WriteAllText("user_data.txt", $"Имя: {nameTextBox.Text}\nВозраст: {AgeTextBox.Text}\nРост: {heightTextBox.Text}\nВес: {weightTextBox.Text}\nПол: {genderComboBox.SelectedItem}\nТип телосложения: {bodyTypeComboBox.SelectedItem}");
 
                     // Формируем строку для метода
-                    string searchQuery = $"user: {nameTextBox.Text},{ageTextBox.Text},{weightTextBox.Text},{heightTextBox.Text}";
+                    string searchQuery = $"user: {nameTextBox.Text},{AgeTextBox.Text},{weightTextBox.Text},{heightTextBox.Text}";
 
                     // Вызываем метод SearchProductsAsync
                     await SearchProductsAsync(searchQuery);
@@ -136,7 +136,7 @@ namespace GoupExam
             };
 
             stackPanel.Children.Add(nameTextBox);
-            stackPanel.Children.Add(ageTextBox);
+            stackPanel.Children.Add(AgeTextBox);
             stackPanel.Children.Add(heightTextBox);
             stackPanel.Children.Add(weightTextBox);
             stackPanel.Children.Add(genderComboBox);
@@ -321,62 +321,90 @@ namespace GoupExam
         {
             CentralArea.Children.Clear();
             var stackPanel = new StackPanel();
-            var searchBox = new TextBox {Text = "", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
-            var searchButton = new Button {Content = "Найти", Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
-            var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(2, 140, 47)), Background = new SolidColorBrush(Color.FromRgb(178, 225, 0)) };
-            //// Поле для ввода названия продукта
+            var searchBox = new TextBox { Text = "", Margin = new Thickness(0, 5, 0, 5) };
+            var searchButton = new Button { Content = "Найти", Margin = new Thickness(0, 5, 0, 5) };
+            var productList = new ListBox { Margin = new Thickness(0, 5, 0, 5) };
+            var addButton = new Button { Content = "Добавить", Margin = new Thickness(0, 5, 0, 5), IsEnabled = false };
 
             searchButton.Click += async (s, args) =>
             {
                 productList.Items.Clear();
 
-                // Здесь выполняется поиск продуктов по базе данных
                 var searchQuery = searchBox.Text;
-
                 try
                 {
-                    // Асинхронное взаимодействие с сервером
-                    var response = await SearchProductsAsync("product:"+searchQuery);
-                    productList.Items.Add(response);
-                    
+                    var response = await SearchProductsAsync("product:" + searchQuery);
+
+                    if (!string.IsNullOrEmpty(response))
+                    {
+                        // Разбираем строку, содержащую данные о продукте
+                        var productInfo = response.Split(',').Select(part => part.Trim()).ToArray();
+
+                        string productName = productInfo.FirstOrDefault(info => info.StartsWith("Имя:"))?.Split(':')[1].Trim();
+                        string caloriesInfo = productInfo.FirstOrDefault(info => info.StartsWith("Калории:"))?.Split(':')[1].Trim();
+
+                        if (!string.IsNullOrEmpty(productName) && !string.IsNullOrEmpty(caloriesInfo))
+                        {
+                            int productCalories = int.Parse(caloriesInfo.Split(' ')[0]); // Извлекаем только число калорий
+
+                            productList.Items.Add($"{productName} - {productCalories} калорий");
+                            addButton.IsEnabled = true; // Активируем кнопку добавления
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Произошла ошибка: " + ex.Message);
+                    MessageBox.Show($"Ошибка: {ex.Message}");
+                }
+            };
+
+            addButton.Click += (s, args) =>
+            {
+                if (productList.SelectedItem != null)
+                {
+                    // Добавляем выбранный продукт в основной список
+                    ProductList.Items.Add(productList.SelectedItem);
+
+                    // Извлекаем калории из строки выбранного продукта
+                    var selectedItem = productList.SelectedItem.ToString();
+                    var caloriePart = selectedItem.Split('-')[1].Trim();
+                    int caloriesToAdd = int.Parse(caloriePart.Split(' ')[0]);
+
+                    // Обновляем общий подсчёт калорий
+                    totalCalories += caloriesToAdd;
+                    TotalCalories.Text = totalCalories.ToString();
+                }
+                else
+                {
+                    MessageBox.Show("Выберите продукт для добавления!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             };
 
             stackPanel.Children.Add(searchBox);
             stackPanel.Children.Add(searchButton);
             stackPanel.Children.Add(productList);
+            stackPanel.Children.Add(addButton);
 
             CentralArea.Children.Add(stackPanel);
         }
+
         private async Task<string> SearchProductsAsync(string searchQuery)
         {
-
             using (var client = new TcpClient())
             {
-                await client.ConnectAsync(ipAddress, port); // Асинхронное подключение к серверу
+                await client.ConnectAsync(ipAddress, port);
 
                 using (var networkStream = client.GetStream())
                 {
-                    // Отправляем сообщение серверу
                     byte[] messageBytes = Encoding.UTF8.GetBytes(searchQuery);
                     await networkStream.WriteAsync(messageBytes, 0, messageBytes.Length);
 
-                    Console.WriteLine("Сообщение отправлено.");
-
-                    // Читаем ответ от сервера
                     byte[] buffer = new byte[1024];
                     int bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
-                    string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                    return response;
+                    return Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 }
             }
         }
-
 
 
 
@@ -384,24 +412,25 @@ namespace GoupExam
         {
             if (ProductList.SelectedItem != null)
             {
-                // Получаем выделенный элемент
                 var selectedItem = ProductList.SelectedItem.ToString();
-
-                // Извлекаем количество калорий из строки
                 var caloriePart = selectedItem.Split('-')[1].Trim();
                 int caloriesToRemove = int.Parse(caloriePart.Split(' ')[0]);
 
-                // Уменьшаем общее количество калорий
                 totalCalories -= caloriesToRemove;
                 TotalCalories.Text = totalCalories.ToString();
 
-                // Удаляем элемент из списка
                 ProductList.Items.Remove(selectedItem);
             }
             else
             {
                 MessageBox.Show("Выберите продукт для удаления!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void ClearList_Click(object sender, RoutedEventArgs e)
+        {
+            ProductList.Items.Clear();
+            TotalCalories.Text = "0";
         }
     }
 }

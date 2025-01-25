@@ -72,6 +72,11 @@
                         <DropShadowEffect/>
                     </Button.Effect>
                 </Button>
+                <Button Content="Очистить список" Height="30" Click="ClearList_Click" Foreground="#FF028C2F" Background="#FFB2E100">
+                    <Button.Effect>
+                        <DropShadowEffect/>
+                    </Button.Effect>
+                </Button>
             </StackPanel>
         </Border>
     </Grid>
